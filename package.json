@@ -1,0 +1,19 @@
+{
+  "name": "biblioteca-publica-agustin-codazzi2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "6.1.1",
+    "bootstrap": "4.6.1",
+    "chart.js": "3.8.0",
+    "datatables.net-dt": "1.12.1",
+    "fullcalendar": "5.11.0"
+  }
+}
