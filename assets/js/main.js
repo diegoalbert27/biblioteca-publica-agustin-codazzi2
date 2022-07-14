@@ -1,137 +1,189 @@
 $(document).ready(function () {
   const currentDate = new Date()
-  const day = currentDate.getDate()
+  // const day = currentDate.getDate()
   const month = currentDate.getMonth() + 1
   const year = currentDate.getFullYear()
 
-  const validateDate = (dateCurrent, datePrestamo) =>
-    dateCurrent > datePrestamo || dateCurrent == datePrestamo
+  const labels = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ].slice(0, month)
 
-  const nowDate = [day, month, year]
-  const prestamos = $(".prestamos").children().children()
+  // Obtener Todos los prestamos
+  function getPrestamos(callback, elements = "prestamos") {
+    $.get("?controller=prestamo&action=get").done((res) => {
+      const data = JSON.parse(res)
+      const object = {
+        prestamos: data.message,
+        devoluciones: data.message.filter(
+          (prestamo) => Number(prestamo.estado) === 0
+        ),
+      }
 
-  // let datePrestamos = [];
+      const results = object[elements]
 
-  $(prestamos).each(function (i, element) {
-    if (element.title !== "") {
-      const dayPrestamo = element.title.substring(8)
-      const monthPrestamo = element.title.substring(5, 7)
-      const yearPrestamo = element.title.substring(0, 4)
-
-      const prestamoDate = [monthPrestamo, dayPrestamo, yearPrestamo]
-
-      // datePrestamos = [...datePrestamos, dayPrestamo];
-
-      // prestamoDate.forEach((date, i) => {
-      //   if (validateDate(nowDate[i], date)) {
-      //     element.style.color = "#f14f4f";
-      //   }
-      // });
-
-      prestamoDate.every((date, i) => {
-        let isVenc = validateDate(nowDate[i], date)
-
-        return isVenc ? (element.style.color = "#f14f4f") : isVenc
-      })
-    }
-  })
-
-  const renderStadistic = (component) => {
-    $.get(
-      "http://localhost/biblioteca-publica-agustin-codazzi2/index.php?controller=prestamo&action=get"
-    )
-      .done((res) => {
-        const { message } = JSON.parse(res)
-        // const dayPrestamos = message.map((prestamo) => prestamo.fe.substring(8));
-        const datePrestamos = message.map((prestamo) => prestamo.fe)
-        const datePrestamosFilter = datePrestamos.filter(
-          (ele, pos) => datePrestamos.indexOf(ele) == pos
-        )
-        const specimens = datePrestamos.filter((date, i) =>
-          i == 0 ? true : datePrestamos[i - 1] != date
-        )
-        const counterSpecimens = specimens.map((spec) => {
-          return { number: spec, count: 0 }
-        })
-
-        counterSpecimens.map((countSpec, i) => {
-          const actualSpecLength = datePrestamos.filter(
-            (date) => date === countSpec.number
-          ).length
-          countSpec.count = actualSpecLength
-        })
-
-        let totalDay = counterSpecimens.map((number) => number.count)
-
-        Highcharts.chart(component, {
-          title: {
-            text: "Préstamos Realizados",
-          },
-          xAxis: {
-            categories: datePrestamosFilter, //["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
-          },
-          series: [
-            {
-              name: "Préstamos",
-              data: (() => {
-                let data = []
-                for (var i = 0; i < totalDay.length; i++) {
-                  data.push([totalDay[i]])
-                }
-                return data
-              })(),
-            },
-          ],
-          credits: {
-            enabled: false,
-          },
-        })
-      })
-      .fail((err) => console.log(err))
-
-    /*CONSTRUCCIÓN DE LA GRÁFICA*/
-    Highcharts.chart(component, {
-      title: {
-        text: "Préstamos Realizados",
-      },
-      xAxis: {
-        categories: [
-          "Lunes",
-          "Martes",
-          "Miércoles",
-          "Jueves",
-          "Viernes",
-          "Sábado",
-          "Domingo",
-        ],
-      },
-      series: [
-        {
-          name: "Préstamos",
-          data: (() => {
-            let data = [];
-            for (var i = 0; i < totalDay.length; i++) {
-              data.push([totalDay[i]]);
-            }
-            return data;
-          })(),
-        },
-      ],
-      credits: {
-        enabled: false,
-      },
-    });
+      callback(results)
+    })
   }
 
-  const estadisticas = document.getElementById("estadisticas")
+  // Obtener todos los solicitantes
+  function getSolicitantes(callback, elements = "solicitantes") {
+    $.get("?controller=solicitante&action=get").done((res) => {
+      const data = JSON.parse(res)
+      const object = {
+        solicitantes: data.message,
+      }
 
-  const showEstadistic =
-    estadisticas !== null
-      ? (component) => renderStadistic(component)
-      : (component) => undefined
+      const results = object[elements]
 
-  showEstadistic(estadisticas)
+      callback(results)
+    })
+  }
 
+  getSolicitantes(results => {
+    const solInactivos = results
+      .filter(sol => Number(sol.estado_s) === 0)
+      .map(sol => sol.estado_s)
+
+    const solActivos = results
+      .filter(sol => Number(sol.estado_s) === 1)
+      .map(sol => sol.estado_s)
+    
+      let solicitantesData        = {
+      labels: [
+        'Solicitantes Activos',
+        'Solicitantes Inactivos', 
+      ],
+      datasets: [
+        {
+          data: [solActivos.length, solInactivos.length],
+          backgroundColor : ['#00c0ef', '#f56954'],
+        }
+      ]
+    }
+    let donutOptions     = {
+      maintainAspectRatio : false,
+      responsive : true,
+    }
+    //-------------
+    //- PIE CHART -
+    //-------------
+    // Get context with jQuery - using jQuery's .get() method.
+    let pieChartCanvas = $('#pieChart').get(0).getContext('2d')
+    let pieData        = solicitantesData;
+    let pieOptions     = {
+      maintainAspectRatio : false,
+      responsive : true,
+    }
+    //Create pie or douhnut chart
+    // You can switch between pie and douhnut using the method below.
+    let pieChart = new Chart(pieChartCanvas, {
+      type: 'pie',
+      data: pieData,
+      options: pieOptions      
+    })
+  })
+
+  // Barra de estadisiticas sobre la cantidad de prestamos que hay por mes
+  const barChartElement = $("#barChart")
+  // Render de muestra de barra de estadisticas
+  getPrestamos((elements) => {
+    const prestamos = elements.map((prestamo) => prestamo.fe.substring(0, 7))
+
+    const specimens = prestamos.filter((date, i) =>
+      i == 0 ? true : prestamos[i - 1] != date
+    )
+
+    const counterSpecimens = specimens.map((spec) => {
+      return { number: spec, count: 0 }
+    })
+
+    counterSpecimens.map((countSpec) => {
+      const actualSpecLength = prestamos.filter(
+        (date) => date === countSpec.number
+      ).length
+      countSpec.count = actualSpecLength
+    })
+
+    let totalDay = counterSpecimens.map((number) => ({
+      number: number.number,
+      count: number.count,
+    }))
+
+    const filterYearCurrent = totalDay
+      .filter((date) => date.number.substring(0, 4) == year)
+      .filter(date => totalDay.indexOf(date))
+
+    let datePrestamos = Array(month).fill(0);
+
+    filterYearCurrent.forEach(date => {
+      let index = Number(date.number.substring(5))
+      datePrestamos[index - 1] = date.count
+    })
+
+    let areaChartData = {
+      labels,
+      datasets: [
+        {
+          label: "Prestamos",
+          backgroundColor: "rgba(60,141,188,0.9)",
+          borderColor: "rgba(60,141,188,0.8)",
+          pointRadius: false,
+          pointColor: "#3b8bba",
+          pointStrokeColor: "rgba(60,141,188,1)",
+          pointHighlightFill: "#fff",
+          pointHighlightStroke: "rgba(60,141,188,1)",
+          data: datePrestamos, //[28, 48, 40, 19, 86, 27, 90]
+        },
+        // {
+        //   label: "Devoluciones",
+        //   backgroundColor: "rgba(210, 214, 222, 1)",
+        //   borderColor: "rgba(210, 214, 222, 1)",
+        //   pointRadius: false,
+        //   pointColor: "rgba(210, 214, 222, 1)",
+        //   pointStrokeColor: "#c1c7d1",
+        //   pointHighlightFill: "#fff",
+        //   pointHighlightStroke: "rgba(220,220,220,1)",
+        //   data: [65, 59, 80, 81, 56, 55, 40],
+        // },
+      ],
+    }
+
+    let barChartCanvas = barChartElement.get(0).getContext("2d")
+
+    
+    let barChartData = jQuery.extend(true, {}, areaChartData)
+    let temp0 = areaChartData.datasets[0]
+    // let temp1 = areaChartData.datasets[1]
+    // barChartData.datasets[0] = temp1
+    barChartData.datasets[0] = temp0
+
+    let barChartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      datasetFill: false,
+    }
+
+    let barChart = new Chart(barChartCanvas, {
+      type: "bar",
+      data: barChartData,
+      options: barChartOptions,
+    })
+  })
+
+
+
+  // Conversion de los datatables
   $(".lazy__table").DataTable({
     language: {
       processing: "Procesando...",
@@ -440,8 +492,8 @@ $(document).ready(function () {
     $.get("?controller=events&action=get&query=new")
       .done((res) => {
         let eventsNews = JSON.parse(res).message
-        
-        if (typeof eventsNews[0].message === 'string') {
+
+        if (typeof eventsNews[0].message === "string") {
           let div = document.createElement("div")
           div.className = "item"
 
@@ -455,7 +507,7 @@ $(document).ready(function () {
           div.innerHTML = template
 
           notificacions.appendChild(div)
-          return;
+          return
         }
 
         eventsNews.forEach((event) => {
@@ -480,8 +532,8 @@ $(document).ready(function () {
     $.get("?controller=events&action=get&query=current")
       .done((res) => {
         let eventsNews = JSON.parse(res).message
-          
-        if (typeof eventsNews[0].message === 'string') return;
+
+        if (typeof eventsNews[0].message === "string") return
 
         eventsNews.forEach((event) => {
           let div = document.createElement("div")
@@ -504,47 +556,55 @@ $(document).ready(function () {
   }
 
   // Questions Scripts
-  const btnAdd = document.getElementById('btnAdd')
+  const btnAdd = document.getElementById("btnAdd")
   if (btnAdd != null) {
-    btnAdd.onclick = function(e) {
-      inputs = Array.from(document.querySelectorAll('.inputs-question .form-control'))
-      
+    btnAdd.onclick = function (e) {
+      inputs = Array.from(
+        document.querySelectorAll(".inputs-question .form-control")
+      )
+
       inputs.forEach((input, i) => {
         let rawData = {}
         rawData[input.name] = input.value
 
         if (i % 2 === 0) {
-          const user = document.getElementById('user')
+          const user = document.getElementById("user")
           rawData[inputs[i + 1].name] = inputs[i + 1].value
-          rawData['user'] = user.value
-          $.post('?controller=question&action=crear', rawData).always(res => {
-            if ((i + 2) >= inputs.length) window.location.href = '?controller=usuario'
+          rawData["user"] = user.value
+          $.post("?controller=question&action=crear", rawData).always((res) => {
+            if (i + 2 >= inputs.length)
+              window.location.href = "?controller=usuario"
           })
         }
       })
-    }  
+    }
   }
 
-  const btnEdit = document.getElementById('btnEdit')
+  const btnEdit = document.getElementById("btnEdit")
   if (btnEdit != null) {
-    btnEdit.onclick = function(e) {
-      inputs = Array.from(document.querySelectorAll('.inputs-question .form-control'))
-      
+    btnEdit.onclick = function (e) {
+      inputs = Array.from(
+        document.querySelectorAll(".inputs-question .form-control")
+      )
+
       inputs.forEach((input, i) => {
         let rawData = {}
         rawData[input.name] = input.value
 
         if (i % 2 === 0) {
-          const user = document.getElementById('user')
+          const user = document.getElementById("user")
           rawData[inputs[i + 1].name] = inputs[i + 1].value
-          rawData['user'] = user.value
-          rawData['id'] = document.getElementById(i).value
-          
-          $.post('?controller=question&action=update', rawData).always(res => {
-            if ((i + 2) >= inputs.length) window.location.href = '?controller=usuario'
-          })
+          rawData["user"] = user.value
+          rawData["id"] = document.getElementById(i).value
+
+          $.post("?controller=question&action=update", rawData).always(
+            (res) => {
+              if (i + 2 >= inputs.length)
+                window.location.href = "?controller=usuario"
+            }
+          )
         }
       })
-    }  
+    }
   }
 })
