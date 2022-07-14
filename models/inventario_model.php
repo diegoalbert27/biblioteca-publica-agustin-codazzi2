@@ -25,11 +25,13 @@
 
             if ($_POST) {
                 
-                 if (!empty($_POST['cota']) && !empty($_POST['cantidad']) && !empty($_POST['minima'])) {
+                 if (!empty($_POST['cantidad']) && !empty($_POST['minima'])) {
+                    $cantidad = $_POST['cantidad']; 
+                    $minima = $_POST['minima'];
                      
                     $this->query = 'INSERT INTO `inventario` (total_inv, min_inv, cant_inv, resto_inv) VALUES (?,?,?,0)';
                 
-                    $this->rows = array($_POST['cantidad'], $_POST['minima'], $_POST['cantidad']);
+                    $this->rows = array(&$cantidad, &$minima, &$cantidad);
                     
                     return $this->execute_single_query('iii', $this->rows);
                 }
@@ -39,9 +41,15 @@
 
         public function update () {
             if ($_POST) {
+                $cantidad = $_POST['cantidad']; 
+                $minima = $_POST['minima'];
+                $total = $_POST['total'];
+                $resto = $_POST['resto'];
+                $id = $_POST['id'];
+                
                 $this->query = 'UPDATE `inventario` SET cant_inv=?, total_inv=?, min_inv=?, resto_inv=? WHERE id_inv=?';
             
-                $this->rows = array($_POST['cantidad'], $_POST['total'], $_POST['minima'], $_POST['resto'], $_POST['id']);
+                $this->rows = array(&$cantidad, &$total, &$minima, &$resto, &$id);
 
                 return $this->execute_single_query('iiiii', $this->rows);   
             }
@@ -50,7 +58,7 @@
         public function updateStock ($cant, $rest, $id) {
             $this->query = 'UPDATE `inventario` SET cant_inv=?, resto_inv=? WHERE id_inv=?';
         
-            $this->rows = array($cant, $rest, $id);
+            $this->rows = array(&$cant, &$rest, &$id);
 
             return $this->execute_single_query('iii', $this->rows);   
         }
@@ -58,9 +66,9 @@
         public function delete () {
 
             if ($_GET) {
-
+                $id = $_GET['id'];
                 $this->query = "DELETE FROM libros WHERE cota='" . $_GET['id']."'";
-                $this->rows = array($_GET['id']);
+                $this->rows = array(&$id);
                 $this->execute_single_query('i', $this->rows);
             }
         }

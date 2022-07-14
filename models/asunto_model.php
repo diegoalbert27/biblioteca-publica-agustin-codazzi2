@@ -27,8 +27,8 @@
                  if (!empty($_POST['asunto'])) {
                      
                     $this->query = 'INSERT INTO `asunto_event` (asunto) VALUES (?)';
-                
-                    $this->rows = array($_POST['asunto']);
+                    $asunto = $_POST['asunto'];
+                    $this->rows = array(&$asunto);
                     
                      return $this->execute_single_query('s', $this->rows);
                   
@@ -44,8 +44,9 @@
                 if (!empty($_POST['asunto']) && $_POST['id']) {
 
                     $this->query = 'UPDATE `asunto_event` SET asunto=? WHERE id_a=?';
-                
-                    $this->rows = array($_POST['asunto'], $_POST['id']);
+                    $asunto = $_POST['asunto'];
+                    $id = $_POST['id'];
+                    $this->rows = array(&$asunto, &$id);
 
                      $this->execute_single_query('si', $this->rows);
                        
@@ -58,7 +59,8 @@
             if ($_GET) {
 
                 $this->query = "DELETE FROM asunto_event WHERE id_a='" . $_GET['id']."'";
-                $this->rows = array($_GET['id']);
+                $id = $_POST['id'];
+                $this->rows = array(&$id);
                 $this->execute_single_query('i', $this->rows);
             }
         }

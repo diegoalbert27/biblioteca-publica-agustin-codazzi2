@@ -12,7 +12,7 @@
 
         public function postIndie ($tabla, $accion, $detalle, $user, $fecha) {
            $this->query = 'INSERT INTO auditorias(ent_aud, acc_aud, det_aud, usr_aud, fec_aud) VALUES (?,?,?,?,?)';            
-           $this->rows = array($tabla, $accion, $detalle, $user, $fecha);
+           $this->rows = array(&$tabla, &$accion, &$detalle, &$user, &$fecha);
             return $this->execute_single_query('ssiis', $this->rows);
         }
 

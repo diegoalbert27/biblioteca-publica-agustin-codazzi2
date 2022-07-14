@@ -30,13 +30,19 @@
 
         public function post () {
             if ($_POST) {
-                 if (!empty($_POST['cota']) && !empty($_POST['titulo']) && !empty($_POST['autor']) && !empty($_POST['categoria']) && !empty($_POST['estado'])  && !empty($_POST['sinopsis'])) {
-                     
+                 if (!empty($_POST['cota']) && !empty($_POST['titulo']) && !empty($_POST['autor']) && !empty($_POST['categoria']) && !empty($_POST['estado'])) {
+                    $sinopsis = empty(trim($_POST['sinopsis'])) ? 'No contiene sinopsis' : $_POST['sinopsis'];
+                    $cota = $_POST['cota']; 
+                    $titulo = $_POST['titulo'];
+                    $autor = $_POST['autor']; 
+                    $categoria = $_POST['categoria'];
+                    $estado = $_POST['estado'];
+
                     $this->query = 'INSERT INTO `libros` (cota, titulo, autor, categoria, estado_libro, sinopsis) VALUES (?,?,?,?,?,?)';
                 
-                    $this->rows = array($_POST['cota'], $_POST['titulo'], $_POST['autor'], $_POST['categoria'], $_POST['estado'], $_POST['sinopsis']);
+                    $this->rows = array(&$cota, &$titulo, &$autor, &$categoria, &$estado, &$sinopsis);
                     
-                    return $this->execute_single_query('sssiss', $this->rows);     
+                    return $this->execute_single_query('sssiss', $this->rows);
                 }
             }
         }
@@ -44,8 +50,17 @@
         public function update () {
             if ($_POST) {
                 if (!empty($_POST['titulo']) && !empty($_POST['autor']) && !empty($_POST['categoria']) && !empty($_POST['estado']) && !empty($_POST['cota']) && $_POST['sinopsis'] && $_POST['id']) {
+                    $sinopsis = empty(trim($_POST['sinopsis'])) ? 'No contiene sinopsis' : $_POST['sinopsis'];
+                    $cota = $_POST['cota']; 
+                    $titulo = $_POST['titulo'];
+                    $autor = $_POST['autor']; 
+                    $categoria = $_POST['categoria'];
+                    $estado = $_POST['estado'];
+                    $id = $_POST['id'];
+
                     $this->query = 'UPDATE `libros` SET titulo=?, autor=?, categoria=?, estado_libro=?, sinopsis=?, cota=? WHERE id_libro=?';
-                    $this->rows = array( $_POST['titulo'], $_POST['autor'], $_POST['categoria'], $_POST['estado'], $_POST['sinopsis'], $_POST['cota'], $_POST['id']);
+
+                    $this->rows = array(&$cota, &$titulo, &$autor, &$categoria, &$estado, &$sinopsis, &$id);
                     return $this->execute_single_query('ssisssi', $this->rows);
                 }
             }
@@ -54,7 +69,8 @@
         public function delete () {
             if ($_GET) {
                 $this->query = "DELETE FROM libros WHERE cota='" . $_GET['id']."'";
-                $this->rows = array($_GET['id']);
+                $id = $_GET['id'];
+                $this->rows = array(&$id);
                 $this->execute_single_query('i', $this->rows);
             }
         }
@@ -63,7 +79,7 @@
 
         public function updateInventario ($cota, $valInv) {
             $this->query = 'UPDATE `libros` SET cantidad=? WHERE id_libro=?';
-            $this->rows = array($valInv, $cota);
+            $this->rows = array(&$valInv, &$cota);
             $this->execute_single_query('ii', $this->rows);
         }
 

@@ -27,8 +27,19 @@
                  if (!empty($_POST['title_event']) && !empty($_POST['organizer_event']) && !empty($_POST['info_event']) && !empty($_POST['date_realized_event']) && !empty($_POST['date_created_event']) && !empty($_POST['place_event'])  && !empty($_POST['type_event'])  && !empty($_POST['participants_event']) && !empty($_POST['state_event']) && !empty($_POST['asunto'])) {
                      
                     $this->query = 'INSERT INTO `events` (title_event, organizer_event, info_event, date_realized_event, date_created_event, place_event, type_event, participants_event, state_event, asunto) VALUES (?,?,?,?,?,?,?,?,?,?)';
+                    
+                    $title_event = $_POST['title_event'];
+                    $organizer_event = $_POST['organizer_event'];
+                    $info_event = $_POST['info_event'];
+                    $date_realized_event = $_POST['date_realized_event'];
+                    $date_created_event = $_POST['date_created_event'];
+                    $place_event = $_POST['place_event'];
+                    $type_event = $_POST['type_event'];
+                    $participants_event = $_POST['participants_event'];
+                    $state_event = $_POST['state_event'];
+                    $asunto = $_POST['asunto'];
                 
-                    $this->rows = array($_POST['title_event'], $_POST['organizer_event'], $_POST['info_event'], $_POST['date_realized_event'], $_POST['date_created_event'], $_POST['place_event'], $_POST['type_event'], $_POST['participants_event'], $_POST['state_event'], $_POST['asunto']);
+                    $this->rows = array(&$title_event, &$organizer_event, &$info_event, &$date_realized_event, &$date_created_event, &$place_event, &$type_event, &$participants_event, &$state_event, &$asunto);
                     
                      return $this->execute_single_query('sssssssisi', $this->rows);
                   
@@ -44,8 +55,8 @@
                  if (!empty($_GET['id'])) {
                      
                     $this->query = 'INSERT INTO `event_participant` (id_user, id_event, state) VALUES (?,?,?)';
-                
-                    $this->rows = array($user, $_GET['id'], 1);
+                    $id = $_GET['id'];
+                    $this->rows = array(&$user, &$id, 1);
                     
                      return $this->execute_single_query('iii', $this->rows);
                   
@@ -61,8 +72,9 @@
                  if (!empty($_GET['id'])) {
                      
                     $this->query = 'INSERT INTO `event_participant` (id_user, id_event, state) VALUES (?,?,?)';
+                    $id = $_GET['id'];
                 
-                    $this->rows = array($user, $_GET['id'], 0);
+                    $this->rows = array(&$user, &$id, 0);
                     
                      return $this->execute_single_query('iii', $this->rows);
                   
@@ -109,8 +121,20 @@
                 if (!empty($_POST['title_event']) && !empty($_POST['organizer_event']) && !empty($_POST['info_event']) && !empty($_POST['date_realized_event']) && !empty($_POST['place_event'])  && !empty($_POST['type_event'])  && !empty($_POST['participants_event'])  && !empty($_POST['state_event'])  && !empty($_POST['asunto']) && $_POST['id']) {
 
                     $this->query = 'UPDATE `events` SET title_event=?, organizer_event=?, info_event=?, date_realized_event=?, place_event=?, type_event=?, participants_event=?, state_event=?, asunto=? WHERE id_event=?';
+
+                    $title_event = $_POST['title_event'];
+                    $organizer_event = $_POST['organizer_event'];
+                    $info_event = $_POST['info_event'];
+                    $date_realized_event = $_POST['date_realized_event'];
+                    $date_created_event = $_POST['date_created_event'];
+                    $place_event = $_POST['place_event'];
+                    $type_event = $_POST['type_event'];
+                    $participants_event = $_POST['participants_event'];
+                    $state_event = $_POST['state_event'];
+                    $asunto = $_POST['asunto'];
+                    $id = $_POST['id'];
                 
-                    $this->rows = array($_POST['title_event'], $_POST['organizer_event'], $_POST['info_event'], $_POST['date_realized_event'], $_POST['place_event'], $_POST['type_event'], $_POST['participants_event'], $_POST['state_event'], $_POST['asunto'], $_POST['id']);
+                    $this->rows = array(&$title_event, &$organizer_event, &$info_event, &$date_realized_event, &$date_created_event, &$place_event, &$type_event, &$participants_event, &$state_event, &$asunto, &$id);
 
                      $this->execute_single_query('ssssssisii', $this->rows);
                        
@@ -123,7 +147,8 @@
             if ($_GET) {
 
                 $this->query = "DELETE FROM events WHERE id_event='" . $_GET['id']."'";
-                $this->rows = array($_GET['id']);
+                $id = $_GET['id'];
+                $this->rows = array(&$id);
                 $this->execute_single_query('i', $this->rows);
             }
         }
@@ -133,7 +158,8 @@
             if ($_GET) {
 
                 $this->query = "DELETE FROM `event_participant` WHERE ID='" . $_GET['id']."'";
-                $this->rows = array($_GET['id']);
+                $id = $_GET['id'];
+                $this->rows = array(&$id);
                 $this->execute_single_query('i', $this->rows);
             }
         }
