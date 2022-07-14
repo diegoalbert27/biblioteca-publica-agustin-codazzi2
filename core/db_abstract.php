@@ -44,16 +44,12 @@ ob_start();
             $this->conn->close();
         }
 
-        public function execute_single_query ($param, $row, $var=array()) {
+        public function execute_single_query ($param, $rows) {
 
             $this->open_connection_db();
 
-            foreach ($row as $key => $value) {
-                $var[$key] = $value;
-            }
-
             $stmt = $this->conn->prepare($this->query);
-            @call_user_func_array(array($stmt, 'bind_param'), array_merge(array($param), $var));
+            @call_user_func_array(array($stmt, 'bind_param'), array_merge(array($param), $rows));
             if (!$stmt->execute()) {
                 return $stmt->error;
             }
