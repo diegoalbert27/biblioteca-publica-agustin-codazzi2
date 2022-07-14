@@ -27,6 +27,7 @@
     <script src="vendor/highCharts/export-data.js"></script> -->
 
     <script src="./node_modules/fullcalendar/main.js"></script>
+    <script src="./node_modules/chart.js/dist/chart.js"></script>
     
     <?php
         if (isset($_SESSION['user_id']))
