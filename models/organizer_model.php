@@ -41,10 +41,12 @@
             if ($_GET) {
                 
                  if (!empty($_GET['id'])) {
+
+                    $id = $_GET['id'];
                      
                     $this->query = 'INSERT INTO `organizer` (id_user, is_actived) VALUES (?,?)';
                 
-                    $this->rows = array($_GET['id'], 0);
+                    $this->rows = array(&$id, 0);
                     
                      return $this->execute_single_query('ii', $this->rows);
                   
@@ -56,7 +58,7 @@
         public function updateStateById ($id, $state) {
             $this->query = 'UPDATE organizer SET is_actived = ? WHERE id = ?';
                 
-            $this->rows = array($state, $id);
+            $this->rows = array(&$state, &$id);
                     
             return $this->execute_single_query('ii', $this->rows);
         }
@@ -66,10 +68,15 @@
             if ($_POST) {
 
                 if (!empty($_POST['title_new']) && !empty($_POST['author_new']) && !empty($_POST['content_new']) && !empty($_POST['date_new']) && $_POST['id']) {
+                    $title = $_POST['title_new'];
+                    $author = $_POST['author_new'];
+                    $content = $_POST['content_new'];
+                    $date = $_POST['date_new'];
+                    $id = $_POST['id'];
 
                     $this->query = 'UPDATE `news` SET title_new=?, author_new=?, content_new=?, date_new=? WHERE id_new=?';
                 
-                    $this->rows = array($_POST['title_new'], $_POST['author_new'], $_POST['content_new'], $_POST['date_new'], $_POST['id']);
+                    $this->rows = array(&$title, &$author, &$content, &$date, &$id);
 
                      $this->execute_single_query('ssssi', $this->rows);
                        
@@ -82,7 +89,8 @@
             if ($_GET) {
 
                 $this->query = "DELETE FROM news WHERE id_new='" . $_GET['id']."'";
-                $this->rows = array($_GET['id']);
+                $id = $_GET['id'];
+                $this->rows = array(&$id);
                 $this->execute_single_query('i', $this->rows);
             }
         }

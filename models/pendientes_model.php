@@ -20,7 +20,8 @@
             if ($_GET) {
 
                 $this->query = 'UPDATE `prestamo` SET pendiente="0" WHERE id_p=?';
-                $this->rows = array($_GET['id']);
+                $id = $_GET['id'];
+                $this->rows = array(&$id);
                 $this->execute_single_query('i', $this->rows);
             }
    

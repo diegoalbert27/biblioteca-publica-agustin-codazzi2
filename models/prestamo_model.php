@@ -33,10 +33,16 @@
             if ($_POST) {
 
                 if (!empty($_POST['sol']) && !empty($_POST['libro']) && !empty($_POST['fe']) && !empty($_POST['fd'] && $_POST['obs']) && !empty($_POST['estado'])) {
+                    $solicitante = $_POST['sol'];
+                    $libro = $_POST['libro'];
+                    $fe = $_POST['fe'];
+                    $fd = $_POST['fd'];
+                    $observaciones = $_POST['obs'];
+                    $estado = $_POST['estado'];
 
                     $this->query = 'INSERT INTO `prestamo` (numero_carnet2, id_libro2, fecha_entrega, fecha_devolucion, observaciones_p, pendiente) VALUES (?,?,?,?,?,?)';
                 
-                    $this->rows = array($_POST['sol'], $_POST['libro'], $_POST['fe'], $_POST['fd'], $_POST['obs'], $_POST['estado']);
+                    $this->rows = array(&$solicitante, &$libro, &$fe, &$fd, &$observaciones, &$estado);
 
                     return $this->execute_single_query('isssss', $this->rows);
                 }
@@ -48,10 +54,17 @@
             if ($_POST) {
 
                 if (!empty($_POST['sol']) && !empty($_POST['libro']) && !empty($_POST['fe']) && !empty($_POST['fd']) && $_POST['obs'] && !empty($_POST['estado']) && $_POST['id']) {
+                    $solicitante = $_POST['sol'];
+                    $libro = $_POST['libro'];
+                    $fe = $_POST['fe'];
+                    $fd = $_POST['fd'];
+                    $observaciones = $_POST['obs'];
+                    $estado = $_POST['estado'];
+                    $id = $_POST['id'];
 
                     $this->query = 'UPDATE `prestamo` SET numero_carnet2=?, id_libro2=?, fecha_entrega=?, fecha_devolucion=?, observaciones_p=?, pendiente=? WHERE id_p=?';
                 
-                    $this->rows = array($_POST['sol'], $_POST['libro'], $_POST['fe'], $_POST['fd'], $_POST['obs'], $_POST['estado'], $_POST['id']);
+                    $this->rows = array(&$solicitante, &$libro, &$fe, &$fd, &$observaciones, &$estado, &$id);
 
                     $this->execute_single_query('isssssi', $this->rows);
                 }
@@ -63,7 +76,8 @@
             if ($_GET) {
 
                 $this->query = 'DELETE FROM prestamo WHERE id_p=?';
-                $this->rows = array($_GET['id']);
+                $id = $_GET['id'];
+                $this->rows = array(&$id);
                 $this->execute_single_query('i', $this->rows);
             }
         }
